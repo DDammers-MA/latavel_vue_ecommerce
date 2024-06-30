@@ -1,32 +1,9 @@
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
+
 <template>
-  <!--
-    This example requires updating your template:
 
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-     <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
-    </div>
+ <GuestLayout title="Sigh in to your account">
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+   
       <form class="space-y-6" action="#" method="POST">
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
@@ -53,15 +30,16 @@
       </form>
 
    
-    </div>
-  </div>
+ 
+  </GuestLayout>
 </template>
 
   
-  <script>
+  <script setup>
 
     import { LockClosedIcon } from "@heroicons/vue/solid"
-import { RouterLink } from "vue-router";
+  import { RouterLink } from "vue-router";
+  import GuestLayout from "../components/GuestLayout.vue";
   
   </script>
   
