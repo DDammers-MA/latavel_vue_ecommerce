@@ -6,7 +6,13 @@ const state = {
     },
     products: {
       loading: false,
-      data: []
+        data: [],
+        link:[],
+        from: null,
+        to: null,
+        page: 1,
+        limit: null,
+      total:null
     }
   };
   
