@@ -15,8 +15,13 @@ class ProductController extends Controller
     public function index()
     {
         $perPage = request('per_page', 10);
-        $search = request('search', '');
+        $search = request('search', false);
+        $sortField = request('sort_field', 'updated_at');
+        $sortDirection = request('sort_direction', 'desc');
+
         $query = Product::query();
+        $query->orderBy($sortField, $sortDirection);
+
         if($search){
             $query->where('title', 'like', "%{$search}%")
                 ->orWhere('description', 'like', "%{$search}%");
