@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;

@@ -13,7 +13,7 @@
             >create new account</a
           >
         </p>
-
+        <x-auth-session-status class="mb-4" :status="session('status')" />
         <x-auth-validation-errors class="mb-4" :errors="$errors"/>
 
         <div class="mb-4">
@@ -55,7 +55,7 @@
         </button>
       </form>
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+  
 
 
 </x-app-layout>

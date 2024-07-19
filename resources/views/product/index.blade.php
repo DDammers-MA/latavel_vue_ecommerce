@@ -5,6 +5,7 @@
             <div
                 x-data="productItem({
                     id: {{ $product->id }},
+                
                     image: '{{ $product->image }}',
                     title: '{{ $product->title }}',
                     price: {{ $product->price }}
@@ -12,7 +13,7 @@
                 class="border border-1 border-gray-200 rounded-md hover:border-purple-600 transition-colors bg-white m-3 flex-wrap"
                 style="flex: 1 1 calc(25% - 1.5rem); "
             >
-                <a href="/src/product.html" class="block overflow-hidden aspect-w-3 aspect-h-3">
+                <a href="{{ route('product.view', $product->slug) }}" class="block overflow-hidden aspect-w-3 aspect-h-3">
                     <img
                         src="{{ $product->image }}"
                         alt=""
@@ -21,7 +22,7 @@
                 </a>
                 <div class="p-4">
                     <h3 class="text-lg">
-                        <a href="/src/product.html">
+                        <a href="{{ route('product.view', $product->slug) }}">
                             {{ $product->title }}
                         </a>
                     </h3>
