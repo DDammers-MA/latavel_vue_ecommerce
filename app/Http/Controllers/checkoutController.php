@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Helpers\Cart;
+use App\Models\CardItem;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 
-class checkoutController extends Controller
+class CheckoutController extends Controller
 {
 
     public function checkout(Request $request)
@@ -76,18 +77,20 @@ class checkoutController extends Controller
         }
     public function success(Request $request)
     {
+                         /** @var \App\Models\User $user */
+                         $user = $request->user();
         \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
 
         try{
             $session_id = $request->get('session_id');
             $session = \Stripe\Checkout\Session::retrieve($session_id);
             if(!$session){
-                return view('checkout.failure');
+                return view('checkout.failure', ['message' => 'invalid session ID']);
             }
         
-            $payment = Payment::query()->where(['session_id' => $session->id, 'status' => PaymentStatus::Pending ])->get();
+            $payment = Payment::query()->where(['session_id' => $session->id, 'status' => PaymentStatus::Pending ])->first();
             if(!$payment){
-                return view('checkout.failure');
+                return view('checkout.failure', ['message' => 'Payment does not exist']);
             }
 
             $payment->status = PaymentStatus::Paid;
@@ -99,12 +102,16 @@ class checkoutController extends Controller
             $order->status = OrderStatus::Paid;
             $order->update();
 
+            CardItem::where(['uder_id' => $user->id])->delete();
+
             $customer = \Stripe\Customer::retrieve($session->customer);
 
             return view('checkout.success', compact('customer'));
 
         }catch(\Exception $e){
-       return view('checkout.failure');
+            throw $e;
+
+       return view('checkout.failure', ['message'=>$e->getMessage()]);
         }
     
  
@@ -114,4 +121,5 @@ class checkoutController extends Controller
     {
         dd($request->all());
     }
+
 }
