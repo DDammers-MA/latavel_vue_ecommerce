@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Helpers\Cart;
+use App\Models\Order;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class checkoutController extends Controller
@@ -10,13 +14,21 @@ class checkoutController extends Controller
 
     public function checkout(Request $request)
         {
+
+                    /** @var \App\Models\User $user */
+        $user = $request->user();
+
             \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
             
 
         list($products, $cartItems) = Cart::getProductsAndCartItems();
      
         $lineItems = [];
+        $totalPrice = 0;
         foreach ($products as $product){
+            $quantity =  $cartItems[$product->id]['quantity'];
+            $totalPrice += $product->price * $quantity;
+        
             $lineItems[] = [
                 'price_data' => [
                     'currency' => 'usd',
@@ -26,7 +38,7 @@ class checkoutController extends Controller
                     ],
                     'unit_amount' => $product->price * 100,
                   ],
-                  'quantity' => $cartItems[$product->id]['quantity'],
+                  'quantity' => $quantity,
             ];
         }
 
@@ -38,6 +50,27 @@ class checkoutController extends Controller
                 'cancel_url' => route('checkout.failure', [], true),
               ]);
 
+        $orderData = [
+            'total_price' => $totalPrice,
+            'status'=> OrderStatus::Unpaind,
+            'created_by' => $user->id,
+            'updated_by' => $user->id,
+        ];
+
+        $order = Order::create($orderData);
+  
+        $paymentData = [
+            'order_id' => $order->id,
+            'amount' => $totalPrice,
+            'status'=> PaymentStatus::Pending,
+            'type'=> 'cc',
+            'created_by' => $user->id,
+            'updated_by' => $user->id,
+            'session_id' => $session->id
+        ];
+        Payment::create($paymentData);
+   
+
         return redirect($session->url);
               
         }
@@ -46,11 +79,26 @@ class checkoutController extends Controller
         \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
 
         try{
-            $session = \Stripe\Checkout\Session::retrieve($request->get('session_id'));
+            $session_id = $request->get('session_id');
+            $session = \Stripe\Checkout\Session::retrieve($session_id);
             if(!$session){
                 return view('checkout.failure');
             }
         
+            $payment = Payment::query()->where(['session_id' => $session->id, 'status' => PaymentStatus::Pending ])->get();
+            if(!$payment){
+                return view('checkout.failure');
+            }
+
+            $payment->status = PaymentStatus::Paid;
+            $payment->update();
+
+            $order = $payment->order;
+
+
+            $order->status = OrderStatus::Paid;
+            $order->update();
+
             $customer = \Stripe\Customer::retrieve($session->customer);
 
             return view('checkout.success', compact('customer'));
