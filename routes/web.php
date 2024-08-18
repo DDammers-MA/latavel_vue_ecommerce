@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductDisplayController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

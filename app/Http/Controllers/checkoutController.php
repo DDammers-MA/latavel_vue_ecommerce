@@ -16,13 +16,13 @@ class CheckoutController extends Controller
     public function checkout(Request $request)
         {
 
-                    /** @var \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = $request->user();
 
-            \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
+        \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
             
 
-        list($products, $cartItems) = Cart::getProductsAndCartItems();
+        [$products, $cartItems] = Cart::getProductsAndCartItems();
      
         $lineItems = [];
         $totalPrice = 0;
@@ -43,17 +43,24 @@ class CheckoutController extends Controller
             ];
         }
 
+        $customer = \Stripe\Customer::create([
+            'name' => $user->name,
+            'email' => $user->email,
+          ]);
+
 
             $session = \Stripe\Checkout\Session::create([
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-               'success_url' => route('checkout.success', [], true) . '?session_id={CHECKOUT_SESSION_ID}',
+                'customer' => $customer,
+                'success_url' => route('checkout.success', [], true) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('checkout.failure', [], true),
               ]);
 
+       
         $orderData = [
             'total_price' => $totalPrice,
-            'status'=> OrderStatus::Unpaind,
+            'status'=> OrderStatus::Unpaid,
             'created_by' => $user->id,
             'updated_by' => $user->id,
         ];
@@ -67,14 +74,19 @@ class CheckoutController extends Controller
             'type'=> 'cc',
             'created_by' => $user->id,
             'updated_by' => $user->id,
-            'session_id' => $session->id
+            'session_id' => $session->id  
         ];
-        Payment::create($paymentData);
+
+     Payment::create($paymentData);
+     
    
 
         return redirect($session->url);
               
         }
+
+
+
     public function success(Request $request)
     {
                          /** @var \App\Models\User $user */
@@ -84,15 +96,19 @@ class CheckoutController extends Controller
         try{
             $session_id = $request->get('session_id');
             $session = \Stripe\Checkout\Session::retrieve($session_id);
-            if(!$session){
-                return view('checkout.failure', ['message' => 'invalid session ID']);
+           if (!$session) {
+                return view('checkout.failure', ['message' => 'Invalid Session ID']);
             }
         
-            $payment = Payment::query()->where(['session_id' => $session->id, 'status' => PaymentStatus::Pending ])->first();
+            $payment = Payment::query()
+            ->where(['session_id' => $session->id, 'status' => PaymentStatus::Pending])
+            ->first();
+      
+
             if(!$payment){
                 return view('checkout.failure', ['message' => 'Payment does not exist']);
             }
-
+            
             $payment->status = PaymentStatus::Paid;
             $payment->update();
 
@@ -102,14 +118,15 @@ class CheckoutController extends Controller
             $order->status = OrderStatus::Paid;
             $order->update();
 
-            CardItem::where(['uder_id' => $user->id])->delete();
+            CardItem::where(['user_id' => $user->id])->delete();
 
             $customer = \Stripe\Customer::retrieve($session->customer);
+  
 
             return view('checkout.success', compact('customer'));
 
         }catch(\Exception $e){
-            throw $e;
+   
 
        return view('checkout.failure', ['message'=>$e->getMessage()]);
         }
