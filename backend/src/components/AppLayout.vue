@@ -23,6 +23,7 @@
     <div v-else class="min-h-full bg-gray-200 flex items-center justify-center">
     <Spinner></Spinner> 
     </div>
+    <Toast></Toast>
   </template>
 
   <script setup>
@@ -30,7 +31,8 @@
   import sidebar from './Sidebar.vue';
 import Navbar from './Navbar.vue';
   import store from '../store';
-import Spinner from './core/Spinner.vue';
+  import Spinner from './core/Spinner.vue';
+import Toast from './core/Toast.vue';
 
 const {title} = defineProps({
  title: String
@@ -47,7 +49,7 @@ const {title} = defineProps({
   }
 
   onMounted(() => {
-    store.dispatch('getUser')
+    store.dispatch('getCurrentUser')
     handleSiderbarOpened();
     window.addEventListener('resize', handleSiderbarOpened)
   })

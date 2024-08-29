@@ -14,6 +14,7 @@
                 <th>Order</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>items</th>
                 <th>Total</th>
                 <th class="w-64">Actions</th>
               </tr>
@@ -30,15 +31,18 @@
                     #{{$order->id}}
                   </a>
                 </td>
-                <td>{{$order->created_at}}</td>
-                <td>
+                <td class="py-1 px-2">{{$order->created_at}}</td>
+                <td class="py-1 px-2">
                 <span class="text-white p-1 rounded 
                 {{ $order->isPaid() ? 'bg-emerald-500' : 'bg-red-600' }}">
                 {{$order->status}}</span>
                 </td>
-                <td>${{$order->total_price}}</td>
-                <td class="flex gap-3">
+                <td class="py-1 px-2 whitespace-nowrap"> {{$order->items()->count()}} items</td>
+                <td class="py-1 px-2 ">${{$order->total_price}}</td>
+                <td class="py-1 px-2 flex gap-2 w-[100px]">
                   <div x-data="{open: false}">
+
+                    <!-- invoice button
                     <button
                       @click="open = true"
                       class="btn-primary bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 py-1 px-2 flex items-center"
@@ -58,21 +62,21 @@
                         />
                       </svg>
                       Invoice
-                    </button>
+                    </button> 
                     <template x-teleport="body">
-                      <!-- Backdrop -->
+                   
                       <div
                         x-show="open"
                         class="fixed flex justify-center items-center left-0 top-0 bottom-0 right-0 z-10 bg-black/80"
                       >
-                        <!-- Dialog -->
+                    
                         <div
                           x-show="open"
                           x-transition
                           @click.outside="open = false"
                           class="w-[90%] md:w-1/2 bg-white rounded-lg"
                         >
-                          <!-- Modal Title -->
+                    
                           <div
                             class="py-2 px-4 text-lg font-semibold bg-gray-100 rounded-t-lg flex items-center justify-between"
                           >
@@ -94,11 +98,10 @@
                               </svg>
                             </button>
                           </div>
-                          <!-- Modal Body -->
                           <div class="p-4">
                               Invoice Content
                           </div>
-                          <!-- Modal Footer -->
+                        
                           <div
                             class="py-2 px-4 text-lg flex justify-end font-semibold bg-gray-100 rounded-b-lg"
                           >
@@ -111,8 +114,9 @@
                           </div>
                         </div>
                       </div>
-                    </template>
+                    </template> -->
                   </div>
+                  
                   @if(!$order->isPaid())
                   <form action="{{route('cart.checkout-order', $order)}}" method="POST">
                     @Csrf
@@ -145,5 +149,7 @@
             </tbody>
           </table>
         </div>
+        <div class="mt-3">  {{$orders->links()}}</div>
+      
       </div>
 </x-app-layout>

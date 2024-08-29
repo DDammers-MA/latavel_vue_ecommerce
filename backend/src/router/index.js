@@ -8,11 +8,20 @@ import ResetPassword from "../views/ResetPassword.vue"
 import Products from "../views/products/Products.vue";
 import store from "../store";
 import NotFound from "../views/NotFound.vue";
+import Orders from "../views/orders/Orders.vue";
+import OrderView from "../views/orders/OrderView.vue";
+import Users from "../views/Users/Users.vue";
+import Customers from "../views/customers/Customers.vue";
 
 
 const routes = [
-
     {
+        path: '/',
+        redirect: 'app'
+},
+    {
+    
+
         path: "/app",
         name: "app",
         component: AppLayout,
@@ -29,7 +38,27 @@ const routes = [
                 path: 'products',
                 name: 'app.products',
                 component: Products
-                },
+            },
+            {
+                path: 'users',
+                name: 'app.users',
+                component: Users
+            },
+            {
+                path: 'customers',
+                name: 'app.customers',
+                component: Customers
+            },
+            {
+                    path: 'orders',
+                    name: 'app.orders',
+                    component: Orders
+            },
+            {
+                    path: 'orders/:id',
+                    name: 'app.orders.view',
+                    component: OrderView
+                    },
         ]
     },
 

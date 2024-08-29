@@ -1,6 +1,7 @@
 import axiosClient from "../axios";
+import state from "./state";
 
-export function getUser({commit}, data) {
+export function getCurrentUser({commit}, data) {
     return axiosClient.get('/user', data)
       .then(({data}) => {
         commit('setUser', data);
@@ -26,23 +27,107 @@ export function logout({commit}) {
       })
 }
   
-export function getProducts({ commit }, {url = null, search = '', perPage = 10, sort_field, sort_direction} = {}) {
+export function getProducts({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
   commit('setProducts', [true])
-  url = url || '/products';
+  url = url || '/products'
+  const params = {
+    per_page: state.products.limit,
+  }
   return axiosClient.get(url, {
-    params: {search, per_page: perPage , sort_field, sort_direction}
+    params: {
+      ...params,
+      search, per_page, sort_field, sort_direction
+    }
   })
-    .then(res => {
-    commit('setProducts', [false, res.data] )
+    .then((response) => {
+      commit('setProducts', [false, response.data])
     })
     .catch(() => {
-      commit('setProducts', [false] )
-  })
+      commit('setProducts', [false])
+    })
 }
 
-export function getProduct({}, id) {
+export function getProduct({commit}, id) {
   return axiosClient.get(`/products/${id}`)
 }
+
+export function getUsers({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
+  commit('setUsers', [true])
+  url = url || '/users'
+  const params = {
+    per_page: state.users.limit,
+  }
+  return axiosClient.get(url, {
+    params: {
+      ...params,
+      search, per_page, sort_field, sort_direction
+    }
+  })
+    .then((response) => {
+      commit('setUsers', [false, response.data])
+    })
+    .catch(() => {
+      commit('setUsers', [false])
+    })
+}
+
+export function getUser({commit}, id) {
+  return axiosClient.get(`/users/${id}`)
+}
+
+export function  createUser({commit}, user) {
+
+  return axiosClient.post('/users', user)
+}
+
+export function updateUser({commit}, user) {
+
+  return axiosClient.put(`/users/${user.id}`, user)
+}
+
+
+
+export function getCustomers({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
+  commit('setCustomers', [true])
+  url = url || '/customers'
+  const params = {
+    per_page: state.customers.limit,
+  }
+  return axiosClient.get(url, {
+    params: {
+      ...params,
+      search, per_page, sort_field, sort_direction
+    }
+  })
+    .then((response) => {
+      commit('setCustomers', [false, response.data])
+    })
+    .catch(() => {
+      commit('setCustomers', [false])
+    })
+}
+
+export function getCustomer({commit}, id) {
+  return axiosClient.get(`/customers/${id}`)
+}
+
+export function createCustomer({commit}, customer) {
+  return axiosClient.post('/customers', customer)
+}
+
+export function updateCustomer({commit}, customer) {
+  return axiosClient.put(`/customers/${customer.id}`, customer)
+}
+
+export function deleteCustomer({commit}, customer) {
+  return axiosClient.delete(`/customers/${customer.id}`)
+}
+
+
+
+
+
+
 
 export function  createProduct({commit}, product) {
   if (product.image instanceof File) {
@@ -76,3 +161,30 @@ export function updateProduct({commit}, product) {
 export function deleteProduct({commit}, id) {
   return axiosClient.delete(`/products/${id}`)
 }
+
+export function getOrders({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
+  commit('setOrders', [true])
+  url = url || '/orders'
+  const params = {
+    per_page: state.orders.limit,
+  }
+  return axiosClient.get(url, {
+    params: {
+      ...params,
+      search, per_page, sort_field, sort_direction
+    }
+  })
+    .then((response) => {
+      console.log('API Response:', response.data); 
+      commit('setOrders', [false, response.data])
+      return response.data;
+    })
+    .catch(() => {
+      commit('setOrders', [false])
+    })
+}
+
+export function getOrder({commit}, id) {
+  return axiosClient.get(`/orders/${id}`)
+}
+

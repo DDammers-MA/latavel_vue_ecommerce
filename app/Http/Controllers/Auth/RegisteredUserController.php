@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         $customer = new Customer();
-        $names = explode(" ", $user->name);
+        $names = explode(" RouteServiceProvider", $user->name);
         $customer->user_id = $user->id;
         $customer->first_name = $names[0];
         $customer->last_name = $names[1] ?? '';
