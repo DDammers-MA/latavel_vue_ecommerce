@@ -50,6 +50,7 @@ const {title} = defineProps({
 
   onMounted(() => {
     store.dispatch('getCurrentUser')
+    store.dispatch('getCountries')
     handleSiderbarOpened();
     window.addEventListener('resize', handleSiderbarOpened)
   })

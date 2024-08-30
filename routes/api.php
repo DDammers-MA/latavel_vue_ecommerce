@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CustomerController;
+use App\Http\Controllers\api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -26,11 +27,18 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('products', ProductController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('customers', CustomerController::class);
+    Route::get('/countries', [CustomerController::class, 'countries']);
     Route::get('/orders', [OrderController::class, 'index']);
+
     Route::get('/orders/statuses', [OrderController::class, 'getStatuses']);
     Route::post('/orders/change-status/{order}/{status}', [OrderController::class, 'changeStatus']);
     Route::get('/orders/{order}', [OrderController::class, 'view']);
  
+
+        Route::get('/dashboard/customers-count',[DashboardController::class, 'activeCustomers'] );
+        Route::get('/dashboard/products-Count',[DashboardController::class, 'activeProducts'] );
+        Route::get('/dashboard/orders-count',[DashboardController::class, 'paidOrders'] );
+        Route::get('/dashboard/incomer-amount',[DashboardController::class, 'totalIncome'] );
  
     });
 

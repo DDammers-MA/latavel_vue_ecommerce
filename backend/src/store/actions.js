@@ -86,6 +86,14 @@ export function updateUser({commit}, user) {
 }
 
 
+export function getCountries({commit}) {
+  return axiosClient.get('countries')
+    .then(({data}) => {
+      commit('setCountries', data)
+    })
+}
+
+
 
 export function getCustomers({commit, state}, {url = null, search = '', per_page, sort_field, sort_direction} = {}) {
   commit('setCustomers', [true])
@@ -118,6 +126,7 @@ export function createCustomer({commit}, customer) {
 export function updateCustomer({commit}, customer) {
   return axiosClient.put(`/customers/${customer.id}`, customer)
 }
+
 
 export function deleteCustomer({commit}, customer) {
   return axiosClient.delete(`/customers/${customer.id}`)

@@ -19,7 +19,7 @@
                        class="absolute left-0 top-0 bg-white right-0 bottom-0 flex items-center justify-center"/>
               <header class="py-3 px-4 flex justify-between items-center">
                 <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                  {{ customer.id ? `Update customer: "${customer.first_name} ${customer.last_name}"` : 'Create new Customer' }}
+                  {{ customer.id ? ` Update customer: "${props.customer.first_name} ${props.customer.last_name}"` : 'Create new Customer' }}
                 </DialogTitle>
                 <button
                   @click="closeModal()"
@@ -58,8 +58,12 @@
                       <CustomInput class="mb-2" v-model="customer.billingAddress.address2" label="Address2" />
                       <CustomInput class="mb-2" v-model="customer.billingAddress.city" label="City" />
                       <CustomInput class="mb-2" v-model="customer.billingAddress.zipcode" label="Zip Code" />
-                      <CustomInput class="mb-2" v-model="customer.billingAddress.country" label="Country" />
-                      <CustomInput class="mb-2" v-model="customer.billingAddress.state" label="State" />
+
+             
+                      <CustomInput type="select" :select-options="countries" class="mb-2" v-model="customer.billingAddress.country_code" label="Country" />
+                      <CustomInput class="mb-2" v-if="billingCountry && billingCountry.states" type="select" :select-options="billingStateOptions" v-model="customer.billingAddress.state" label="State" />
+<CustomInput class="mb-2" v-else v-model="customer.billingAddress.state" label="State" />
+
                       </div>
        
                     </div>
@@ -71,8 +75,12 @@
                       <CustomInput class="mb-2" v-model="customer.shippingAddress.address2" label="Address2" />
                       <CustomInput class="mb-2" v-model="customer.shippingAddress.city" label="City" />
                       <CustomInput class="mb-2" v-model="customer.shippingAddress.zipcode" label="Zip Code" />
-                      <CustomInput class="mb-2" v-model="customer.shippingAddress.country" label="Country" />
-                      <CustomInput class="mb-2" v-model="customer.shippingAddress.state" label="State" />
+                      
+
+                      <CustomInput type="select" :select-options="countries" class="mb-2" v-model="customer.shippingAddress.country_code" label="Country" />
+                      <CustomInput class="mb-2" v-if="shippingCountry && shippingCountry.states" type="select" :select-options="shippingStateOptions" v-model="customer.shippingAddress.state" label="State" />
+<CustomInput class="mb-2" v-else v-model="customer.shippingAddress.state" label="State" />
+
                       </div>
                     </div>
                     
@@ -109,7 +117,7 @@ import store from "../../store/index.js";
 import Spinner from "../../components/core/Spinner.vue";
 
 const props = defineProps({
-  modelValue: Boolean,
+  modelValue: [String, Number, Boolean, File],
   customer: {
     required: true,
     type: Object,
@@ -119,11 +127,19 @@ const props = defineProps({
 
 const customer = ref({
 
+  id: null,
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  status: false,
+  billingAddress: {},
+  shippingAddress: {}
   
 });
 
 const loading = ref(false);
-const emit = defineEmits(['update:modelValue', 'close']);
+const emit = defineEmits(['update:modelValue']);
 
 const show = computed({
   get: () => props.modelValue,
@@ -144,11 +160,27 @@ onUpdated(() => {
     },
 
     shippingAddress: {
-      ...props.customer.billingAddress
+      ...props.customer.shippingAddress
     }
 
   };
 });
+
+
+const countries = computed(() => store.state.countries.map(c => ({key: c.code, text: c.name})))
+const billingCountry = computed(() => store.state.countries.find(c => c.code === customer.value.billingAddress.country_code))
+const billingStateOptions = computed(() => {
+  if (!billingCountry.value || !billingCountry.value.states) return [];
+
+  return Object.entries(billingCountry.value.states).map(c => ({key: c[0], text: c[1]}))
+})
+const shippingCountry = computed(() => store.state.countries.find(c => c.code === customer.value.shippingAddress.country_code))
+const shippingStateOptions = computed(() => {
+  if (!shippingCountry.value || !shippingCountry.value.states) return [];
+
+  return Object.entries(shippingCountry.value.states).map(c => ({key: c[0], text: c[1]}))
+})
+
 
 function closeModal() {
   show.value = false;
@@ -157,12 +189,14 @@ function closeModal() {
 
 function onSubmit() {
   loading.value = true;
+
   if (customer.value.id) {
+    customer.value.status = !!customer.value.status;
     store.dispatch('updateCustomer', customer.value)
       .then(response => {
         loading.value = false;
         if (response.status === 200) {
-          store.dispatch('getCustomer');
+          store.dispatch('getCustomer', customer.value.id); // Pass the customer ID if required
           closeModal();
         }
       });
@@ -171,7 +205,7 @@ function onSubmit() {
       .then(response => {
         loading.value = false;
         if (response.status === 201) {
-          store.dispatch('getCustomer');
+          store.dispatch('getCustomer'); // Consider passing ID if needed
           closeModal();
         }
       })
