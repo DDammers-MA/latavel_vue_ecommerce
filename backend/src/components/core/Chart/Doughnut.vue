@@ -1,7 +1,7 @@
-<script>
-import { defineComponent, h } from 'vue'
 
-import { Doughnut } from 'vue-chartjs'
+<script>
+import { Doughnut } from 'vue-chartjs';
+
 import {
   Chart as ChartJS,
   Title,
@@ -13,7 +13,7 @@ import {
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
-export default defineComponent({
+export default {
   name: 'DoughnutChart',
   components: {
     Doughnut
@@ -22,6 +22,10 @@ export default defineComponent({
     chartId: {
       type: String,
       default: 'doughnut-chart'
+    },
+    datasetIdKey: {
+      type: String,
+      default: 'label'
     },
     width: {
       type: Number,
@@ -45,31 +49,31 @@ export default defineComponent({
     },
     data: {
       type: Object,
-      required: true
+      required: true,
     }
   },
   setup(props) {
-    const chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false
+    return {
+      chartData: {
+        labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
+        datasets: [
+          {
+            backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
+            data: [40, 20, 80, 10]
+          }
+        ]
+      },
+      
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+
+      
     }
 
-    return () =>
-      h(Doughnut, {
-        chartData: props.data,
-        chartOptions,
-        chartId: props.chartId,
-        width: props.width,
-        height: props.height,
-        cssClasses: props.cssClasses,
-        styles: props.styles,
-        plugins: props.plugins
-      })
   }
-})
 
+  
+}
 </script>
-
-<style scoped>
-
-</style>
