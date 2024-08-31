@@ -47,7 +47,8 @@ class DashboardController extends Controller
 
     public function latesCustomer(){
         return Customer::query()
-            ->join('users as u', 'u.id', '=', 'customers')
+        ->select([ 'id', 'first_name', 'last_name', 'u.email', 'phone', 'u.created_at'])
+            ->join('users as u', 'u.id', '=', 'customers.user_id')
             ->where('status', CustomerStatus::Active->value)
             ->orderBy('created_at', 'desc')
             ->limit(5)

@@ -1,79 +1,33 @@
+<script setup>
+import { defineProps } from 'vue';
+import { Doughnut as ChartDoughnut } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 
-<script>
-import { Doughnut } from 'vue-chartjs';
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  CategoryScale
-} from 'chart.js'
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
-
-export default {
-  name: 'DoughnutChart',
-  components: {
-    Doughnut
+const props = defineProps({
+  width: {
+    type: Number,
+    default: 400
   },
-  props: {
-    chartId: {
-      type: String,
-      default: 'doughnut-chart'
-    },
-    datasetIdKey: {
-      type: String,
-      default: 'label'
-    },
-    width: {
-      type: Number,
-      default: 400
-    },
-    height: {
-      type: Number,
-      default: 400
-    },
-    cssClasses: {
-      default: '',
-      type: String
-    },
-    styles: {
-      type: Object,
-      default: () => {}
-    },
-    plugins: {
-      type: Array,
-      default: () => []
-    },
-    data: {
-      type: Object,
-      required: true,
-    }
+  height: {
+    type: Number,
+    default: 400
   },
-  setup(props) {
-    return {
-      chartData: {
-        labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-        datasets: [
-          {
-            backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-            data: [40, 20, 80, 10]
-          }
-        ]
-      },
-      
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-
-      
-    }
-
+  data: {
+    type: Object,
+    required: true
   }
+});
 
-  
-}
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false
+};
 </script>
+
+<template>
+  <div>
+    <ChartDoughnut :data="props.data" :options="chartOptions" :width="props.width" :height="props.height" />
+  </div>
+</template>
