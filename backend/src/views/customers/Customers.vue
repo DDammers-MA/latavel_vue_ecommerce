@@ -4,13 +4,12 @@
     
     </div>
     <customerTable @clickEdit="editCustomer"/>
-    <CustomerModel v-model="showCustomerModal" :customer="customerModel" @close="onModalClose"/>
-  </template>
+ </template>
   
   <script setup>
   import {computed, onMounted, ref} from "vue";
   import store from "../../store";
-  import CustomerModel from "./CustomerModal.vue";
+  
   import customerTable from "./CustomerTable.vue";
   
   const DEFAULT_CUSTOMER = {

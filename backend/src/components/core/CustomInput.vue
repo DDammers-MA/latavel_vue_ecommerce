@@ -35,7 +35,7 @@
           :name="name"
           :required="required"
           :value="modelValue"
-          @change="$emit('update:modelValue', $event.target.value)"
+          @change="onChange($event.target.value)"
           :class="inputClasses">
           <option v-for="option in selectOptions" :key="option.key" :value="option.key">{{ option.text }}</option>
         </select>
@@ -117,4 +117,9 @@ const inputClasses = computed(() => {
 });
 
 const emit = defineEmits(['update:modelValue', 'change']);
+
+function onChange(value) {
+  emit('update:modelValue', value)
+  emit('change', value)
+}
 </script>

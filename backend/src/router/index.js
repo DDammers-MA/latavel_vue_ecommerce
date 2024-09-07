@@ -12,6 +12,7 @@ import Orders from "../views/orders/Orders.vue";
 import OrderView from "../views/orders/OrderView.vue";
 import Users from "../views/Users/Users.vue";
 import Customers from "../views/customers/Customers.vue";
+import CustomerView from "../views/customers/CustomerView.vue";
 
 
 const routes = [
@@ -48,6 +49,12 @@ const routes = [
                 path: 'customers',
                 name: 'app.customers',
                 component: Customers
+            },
+
+            {
+                path: 'customers/:id',
+                name: 'app.customers.view',
+                component: CustomerView
             },
             {
                     path: 'orders',
